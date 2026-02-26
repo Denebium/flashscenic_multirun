@@ -1,140 +1,157 @@
 import torch
 import numpy as np
 
-def get_aucell(exp_array, adj_array, 
-                          k=50, auc_threshold=0.05, 
+def get_aucell(exp_array, adj_array,
+                          k=50, auc_threshold=0.05,
                           device='cuda', batch_size=32,
                           seed=None):
     """
     Fully vectorized pySCENIC-equivalent AUCell calculation.
-    
+
+    Uses the actual number of target genes per TF/regulon (not fixed k) to match
+    pySCENIC behavior. When adj_array has weighted entries, uses weights for AUC.
+
     Args:
         exp_array (np.ndarray): Expression matrix (n_cells x n_genes)
-        adj_array (np.ndarray): Adjacency matrix (n_tfs x n_genes)
-        k (int): Top k target genes per TF. Default is 50.
+        adj_array (np.ndarray): Adjacency matrix (n_tfs x n_genes), can be binary or weighted
+        k (int): Max target genes per TF (pads shorter regulons). Default is 50.
         auc_threshold (float): Fraction of genome for AUC calculation. Default is 0.05.
         device (str): Device, 'cpu' or 'cuda'. Default is 'cuda'.
         batch_size (int): Batch size for processing cells. Default is 32.
         seed (int): Random seed for tie-breaking. Default is None.
-    
+
     Returns:
         np.ndarray: AUCell scores matrix of shape (n_cells, n_TFs)
     """
     n_cells, n_genes = exp_array.shape
     n_tfs = adj_array.shape[0]
-    
-    # Calculate rank cutoff
+
+    # Calculate rank cutoff (matches pySCENIC's derive_rank_cutoff)
     rank_cutoff = max(1, int(round(auc_threshold * n_genes)) - 1)
-    max_auc = float((rank_cutoff + 1) * k)
-    
-    # Get top k target genes for each TF
+
     adj_tensor = torch.tensor(adj_array, device=device, dtype=torch.float32)
-    _, topk_adj_idx = adj_tensor.topk(k, dim=1)  # (n_tfs, k)
-    
+
+    # Count actual target genes per TF (non-zero entries)
+    n_targets_per_tf = (adj_tensor > 0).sum(dim=1)  # (n_tfs,)
+
+    # Clamp k to actual number of targets available
+    k_actual = min(k, n_genes)
+
+    # Get top k target genes and their weights for each TF
+    topk_weights, topk_adj_idx = adj_tensor.topk(k_actual, dim=1)  # (n_tfs, k_actual)
+
+    # Create a mask for real target genes (weight > 0) vs padding
+    target_mask = topk_weights > 0  # (n_tfs, k_actual)
+
+    # Compute per-TF weight sums and max_auc for proper normalization
+    # pySCENIC: max_auc = (rank_cutoff + 1) * sum(weights)
+    weight_sums = topk_weights.sum(dim=1)  # (n_tfs,)
+    # For binary adj (all weights 1.0), this equals n_targets_per_tf
+    max_aucs = (rank_cutoff + 1) * weight_sums  # (n_tfs,)
+
     exp_tensor = torch.tensor(exp_array, device=device, dtype=torch.float32)
     all_aucs = []
-    
+
     with torch.no_grad():
         for i in range(0, n_cells, batch_size):
             batch_exp = exp_tensor[i:min(i+batch_size, n_cells), :]
             batch_size_actual = batch_exp.shape[0]
-            
+
             # Add noise for tie-breaking
             if seed is not None:
                 torch.manual_seed(seed + i)
             noise = torch.rand_like(batch_exp) * 1e-10
             batch_exp_noisy = batch_exp + noise
-            
-            # Get rankings (descending order)
+
+            # Get rankings (descending order, 0-indexed)
             order = torch.argsort(-batch_exp_noisy, dim=1)
             rankings = torch.argsort(order, dim=1)  # (batch, n_genes)
-            
-            # Expand rankings to get target gene rankings for all TFs at once
-            # rankings: (batch, n_genes), topk_adj_idx: (n_tfs, k)
-            # We want: (batch, n_tfs, k)
-            
-            # Gather target gene rankings
+
+            # Gather target gene rankings for all TFs at once
             topk_adj_idx_expanded = topk_adj_idx.unsqueeze(0).expand(batch_size_actual, -1, -1)
-            # (batch, n_tfs, k)
-            
+
             target_rankings = torch.gather(
                 rankings.unsqueeze(1).expand(-1, n_tfs, -1),  # (batch, n_tfs, n_genes)
                 dim=2,
                 index=topk_adj_idx_expanded
-            )  # (batch, n_tfs, k)
-            
+            )  # (batch, n_tfs, k_actual)
+
             # Compute AUC for all TFs at once
-            batch_aucs = _compute_auc(target_rankings, rank_cutoff, k, max_auc)
+            batch_aucs = _compute_auc(
+                target_rankings, topk_weights, target_mask,
+                rank_cutoff, max_aucs
+            )
             all_aucs.append(batch_aucs.cpu().numpy())
-    
+
     return np.concatenate(all_aucs, axis=0)
 
 
-def _compute_auc(target_rankings, rank_cutoff, k, max_auc):
+def _compute_auc(target_rankings, weights, target_mask, rank_cutoff, max_aucs):
     """
-    Vectorized AUC computation for a batch of cells across all TFs.
-    
+    Vectorized weighted AUC computation matching pySCENIC's weighted_auc1d.
+
     Args:
-        target_rankings: (batch_size, n_tfs, k) tensor
+        target_rankings: (batch_size, n_tfs, k) tensor of gene rankings
+        weights: (n_tfs, k) tensor of gene weights
+        target_mask: (n_tfs, k) bool tensor, True for real target genes
         rank_cutoff: int
-        k: int
-        max_auc: float
-    
+        max_aucs: (n_tfs,) tensor of per-TF max AUC values
+
     Returns:
         (batch_size, n_tfs) tensor of AUC values
     """
     batch_size, n_tfs, k_val = target_rankings.shape
     device = target_rankings.device
-    
-    # Mask rankings < rank_cutoff (valid rankings)
-    mask = target_rankings < rank_cutoff  # (batch, n_tfs, k)
-    
-    # Count valid entries per (cell, TF)
-    valid_counts = mask.sum(dim=2)  # (batch, n_tfs)
-    
-    # Convert to float for computation
+
+    # Expand weights and target_mask to batch dimension
+    weights_expanded = weights.unsqueeze(0).expand(batch_size, -1, -1)  # (batch, n_tfs, k)
+    target_mask_expanded = target_mask.unsqueeze(0).expand(batch_size, -1, -1)  # (batch, n_tfs, k)
+
+    # Valid genes: real target genes with rank < rank_cutoff
+    # (matches pySCENIC: filter_idx = ranking < rank_cutoff, applied only to regulon genes)
+    rank_valid = target_rankings < rank_cutoff  # (batch, n_tfs, k)
+    valid_mask = rank_valid & target_mask_expanded  # only real target genes within cutoff
+
+    # Replace invalid entries with rank_cutoff (will sort to end, contribute 0)
     target_rankings_float = target_rankings.float()
-    
-    # Replace invalid rankings with a large value (but not inf to avoid NaN)
-    # Use rank_cutoff as replacement so they sort to the end
-    invalid_replacement = torch.full_like(target_rankings_float, float(rank_cutoff))
-    target_rankings_masked = torch.where(mask, target_rankings_float, invalid_replacement)
-    
-    # Sort rankings (invalid ones will be at the end)
-    sorted_rankings, _ = torch.sort(target_rankings_masked, dim=2)  # (batch, n_tfs, k)
-    
-    # Create position indices (1, 2, 3, ..., k)
-    positions = torch.arange(1, k_val + 1, device=device, dtype=torch.float32)
-    positions = positions.view(1, 1, k_val).expand(batch_size, n_tfs, k_val)
-    
-    # Mask positions beyond valid count
-    position_mask = positions <= valid_counts.unsqueeze(2).float()  # (batch, n_tfs, k)
-    
-    # For the trapezoidal rule, we need:
-    # AUC = sum_i (rank[i+1] - rank[i]) * i
-    # where ranks are sorted and include rank_cutoff at the end
-    
-    # Append rank_cutoff to sorted_rankings
+    target_rankings_masked = torch.where(valid_mask, target_rankings_float,
+                                         torch.full_like(target_rankings_float, float(rank_cutoff)))
+
+    # Replace invalid weights with 0
+    weights_masked = torch.where(valid_mask, weights_expanded,
+                                 torch.zeros_like(weights_expanded))
+
+    # Sort by ranking (invalid entries go to end)
+    sorted_indices = torch.argsort(target_rankings_masked, dim=2)
+    sorted_rankings = torch.gather(target_rankings_masked, 2, sorted_indices)  # (batch, n_tfs, k)
+    sorted_weights = torch.gather(weights_masked, 2, sorted_indices)  # (batch, n_tfs, k)
+
+    # Cumulative weights (matches pySCENIC: y = weights[sort_idx].cumsum())
+    cumsum_weights = sorted_weights.cumsum(dim=2)  # (batch, n_tfs, k)
+
+    # Append rank_cutoff to sorted_rankings for diff computation
     cutoff_tensor = torch.full((batch_size, n_tfs, 1), rank_cutoff, device=device, dtype=torch.float32)
     sorted_with_cutoff = torch.cat([sorted_rankings, cutoff_tensor], dim=2)  # (batch, n_tfs, k+1)
-    
-    # Compute differences: rank[i+1] - rank[i]
+
+    # Compute rank differences: rank[i+1] - rank[i]
+    # (matches pySCENIC: np.diff(x))
     rank_diffs = sorted_with_cutoff[:, :, 1:] - sorted_with_cutoff[:, :, :-1]  # (batch, n_tfs, k)
-    
-    # Cumulative weights (1, 2, 3, ...) up to valid_count
-    cumsum_weights = positions * position_mask  # (batch, n_tfs, k)
-    
-    # AUC contribution from each step
+
+    # AUC = sum(diff(x) * cumsum(y)) / max_auc
+    # (matches pySCENIC: np.sum(np.diff(x) * y) / max_auc)
     auc_contrib = rank_diffs * cumsum_weights
-    
-    # Zero out contributions from invalid positions (this handles the case where
-    # invalid rankings were replaced with rank_cutoff, so rank_diffs will be 0)
-    auc_contrib = auc_contrib * position_mask
-    
-    # Sum and normalize
-    aucs = auc_contrib.sum(dim=2) / max_auc  # (batch, n_tfs)
-    
-    # Handle edge case: if all rankings are invalid, ensure AUC is 0 (not NaN)
-    aucs = torch.where(valid_counts > 0, aucs, torch.zeros_like(aucs))
-    
+
+    # Only count contributions from valid positions
+    valid_sorted = torch.gather(valid_mask.float(), 2, sorted_indices)
+    auc_contrib = auc_contrib * valid_sorted
+
+    # Sum and normalize per-TF
+    raw_aucs = auc_contrib.sum(dim=2)  # (batch, n_tfs)
+    max_aucs_expanded = max_aucs.unsqueeze(0).expand(batch_size, -1)  # (batch, n_tfs)
+
+    # Normalize, avoiding division by zero for TFs with no targets
+    aucs = torch.where(max_aucs_expanded > 0,
+                       raw_aucs / max_aucs_expanded,
+                       torch.zeros_like(raw_aucs))
+
     return aucs

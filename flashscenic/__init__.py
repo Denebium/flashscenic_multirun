@@ -16,6 +16,7 @@ from .cistarget import (
 from .modules import (
     select_topk_targets,
     select_threshold_targets,
+    select_top_n_per_target,
     filter_by_min_targets,
     filter_by_mapped_fraction,
     get_target_indices,
@@ -76,6 +77,7 @@ __all__ = [
     # Module selection
     'select_topk_targets',
     'select_threshold_targets',
+    'select_top_n_per_target',
     'filter_by_min_targets',
     'filter_by_mapped_fraction',
     'get_target_indices',

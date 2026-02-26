@@ -28,6 +28,8 @@ def run_flashscenic(
     grn_sparsity_threshold: float = 1.5,
     # --- Module filtering ---
     module_k: int = 50,
+    module_percentile_thresholds: tuple = (75,),
+    module_top_n_per_target: tuple = (5, 10, 50),
     module_min_targets: int = 20,
     module_min_fraction: float = None,
     module_include_tf: bool = True,
@@ -90,6 +92,14 @@ def run_flashscenic(
 
     module_k : int, default=50
         Top target genes per TF for module creation.
+    module_percentile_thresholds : tuple of int, default=(75,)
+        Percentile thresholds for percentile-based modules. Each value
+        creates a module type keeping targets above that global weight
+        percentile. Empty tuple to skip.
+    module_top_n_per_target : tuple of int, default=(5, 10, 50)
+        N values for top-N-per-target modules. For each N, finds each
+        target gene's top N strongest regulators, then regroups by TF.
+        Empty tuple to skip.
     module_min_targets : int, default=20
         Minimum target genes for a TF module to be retained.
     module_min_fraction : float, default=0.8
@@ -154,7 +164,10 @@ def run_flashscenic(
     from .data import download_data
     from .aucell import get_aucell
     from .cistarget import CisTargetPruner
-    from .modules import select_topk_targets, filter_by_min_targets
+    from .modules import (
+        select_topk_targets, select_threshold_targets,
+        select_top_n_per_target, filter_by_min_targets,
+    )
     from . import regulons_to_adjacency
 
     if aucell_k is None:
@@ -224,42 +237,71 @@ def run_flashscenic(
     # ---- Step 3: Module Filtering ----
     _log("Step 3/5: Creating and filtering modules...")
     tf_indices_tensor = torch.tensor(tf_indices, device=device)
-    filtered_adj = select_topk_targets(
-        adj_matrix,
-        k=module_k,
-        include_tf=module_include_tf,
-        tf_indices=tf_indices_tensor,
-        device=device,
-    )
-    filtered_adj, tf_mask = filter_by_min_targets(
-        filtered_adj,
-        min_targets=module_min_targets,
-        min_fraction=module_min_fraction,
-        device=device,
-    )
+    adj_tensor = torch.from_numpy(adj_matrix).to(device=device, dtype=torch.float32) \
+        if isinstance(adj_matrix, np.ndarray) else adj_matrix
 
-    valid_tf_names = [
-        tf_names[i]
-        for i, keep in enumerate(tf_mask.cpu().numpy())
-        if keep
-    ]
-    n_valid_tfs = len(valid_tf_names)
-    _log(f"  {n_valid_tfs} TFs with >= {module_min_targets} targets "
-         f"(min_fraction={module_min_fraction})")
+    # Generate multiple module types from the same adjacency matrix
+    module_type_adjs = []  # list of (filtered_adj, label)
 
-    if n_valid_tfs == 0:
+    # Type 1: Top-k targets (always included)
+    topk_adj = select_topk_targets(
+        adj_tensor, k=module_k, include_tf=module_include_tf,
+        tf_indices=tf_indices_tensor, device=device,
+    )
+    module_type_adjs.append((topk_adj, f"top{module_k}"))
+
+    # Type 2: Percentile threshold modules
+    for pct in module_percentile_thresholds:
+        pct_adj = select_threshold_targets(
+            adj_tensor, percentile=pct, include_tf=module_include_tf,
+            tf_indices=tf_indices_tensor, device=device,
+        )
+        module_type_adjs.append((pct_adj, f"pct{pct}"))
+
+    # Type 3: Top-N-per-target modules
+    for n_val in module_top_n_per_target:
+        npt_adj = select_top_n_per_target(
+            adj_tensor, n=n_val, include_tf=module_include_tf,
+            tf_indices=tf_indices_tensor, device=device,
+        )
+        module_type_adjs.append((npt_adj, f"top{n_val}pertarget"))
+
+    _log(f"  {len(module_type_adjs)} module types: "
+         f"{[label for _, label in module_type_adjs]}")
+
+    # Filter each module type and collect all modules + TF names
+    modules = []
+    valid_tf_names = []
+    total_modules = 0
+
+    for type_adj, label in module_type_adjs:
+        filtered_adj, tf_mask = filter_by_min_targets(
+            type_adj,
+            min_targets=module_min_targets,
+            min_fraction=module_min_fraction,
+            device=device,
+        )
+        mask_np = tf_mask.cpu().numpy()
+        type_tf_names = [tf_names[i] for i, keep in enumerate(mask_np) if keep]
+        n_type_tfs = len(type_tf_names)
+        total_modules += n_type_tfs
+
+        for i in range(n_type_tfs):
+            target_mask = filtered_adj[i] > 0
+            target_indices = torch.where(target_mask)[0]
+            modules.append(target_indices)
+
+        valid_tf_names.extend(type_tf_names)
+        _log(f"    {label}: {n_type_tfs} TF modules")
+
+    _log(f"  {total_modules} total modules across all types")
+
+    if total_modules == 0:
         raise ValueError(
             "No TF modules survived filtering. Consider lowering "
             "module_min_targets, module_min_fraction, or "
             "grn_sparsity_threshold."
         )
-
-    # Build module gene index lists
-    modules = []
-    for i in range(n_valid_tfs):
-        target_mask = filtered_adj[i] > 0
-        target_indices = torch.where(target_mask)[0]
-        modules.append(target_indices)
 
     # ---- Step 4: cisTarget Pruning ----
     _log(f"Step 4/5: Running cisTarget pruning "
@@ -324,6 +366,8 @@ def run_flashscenic(
             "grn_n_steps": grn_n_steps,
             "grn_sparsity_threshold": grn_sparsity_threshold,
             "module_k": module_k,
+            "module_percentile_thresholds": module_percentile_thresholds,
+            "module_top_n_per_target": module_top_n_per_target,
             "module_min_targets": module_min_targets,
             "module_min_fraction": module_min_fraction,
             "module_include_tf": module_include_tf,
@@ -341,7 +385,7 @@ def run_flashscenic(
             "seed": seed,
             "n_cells": n_cells,
             "n_genes": n_genes,
-            "n_tfs": n_valid_tfs,
+            "n_modules": total_modules,
             "n_regulons": len(merged_regulons),
         },
     }

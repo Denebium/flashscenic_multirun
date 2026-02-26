@@ -305,38 +305,44 @@ def filter_by_annotations(
     result: Dict[str, torch.Tensor],
     motif_names: List[str],
     motif_annotations: Optional[MotifAnnotation],
-    filter_for_annotation: bool = True
+    filter_for_annotation: bool = True,
+    tf_name: Optional[str] = None
 ) -> Dict[str, torch.Tensor]:
     """
     Filter enriched motifs by annotations (CPU implementation).
-    
+
     Matches pyscenic behavior: filters enriched motifs to keep only those
-    with annotations when filter_for_annotation=True.
-    
+    annotated for the specific TF of the module being pruned.
+
     Args:
         result: Pruning result dict with 'enriched_mask', 'nes', 'aucs', etc.
         motif_names: List of motif names (from database)
         motif_annotations: MotifAnnotation object (None = no filtering)
         filter_for_annotation: If True, only keep motifs with annotations
-    
+        tf_name: TF name to filter for. If provided, only keep motifs annotated
+                 for this specific TF (matching pySCENIC behavior). If None,
+                 keep motifs with any annotation.
+
     Returns:
         Filtered result dict (all tensors remain on original device)
     """
     if motif_annotations is None or not filter_for_annotation:
         return result
-    
+
     enriched_indices = torch.where(result['enriched_mask'])[0].cpu().numpy()
-    
+
     if len(enriched_indices) == 0:
         return result
-    
+
     # Create mask for motifs with annotations (CPU)
+    # When tf_name is provided, only keep motifs annotated for that specific TF
+    # (matching pySCENIC: motif must be annotated for the module's TF)
     device = result['enriched_mask'].device
     has_annotation_mask = torch.zeros(len(motif_names), dtype=torch.bool)
-    
+
     for idx in enriched_indices:
         motif_id = motif_names[idx]
-        if motif_annotations.has_annotation(motif_id):
+        if motif_annotations.has_annotation(motif_id, tf_name=tf_name):
             has_annotation_mask[idx] = True
     
     # Apply filter (keep on same device as result)
@@ -711,7 +717,8 @@ class CisTargetPruner:
     def prune(
         self,
         module_gene_indices: ArrayLike,
-        weights: Optional[ArrayLike] = None
+        weights: Optional[ArrayLike] = None,
+        tf_name: Optional[str] = None
     ) -> Dict[str, torch.Tensor]:
         """
         Prune a single module (single database mode only).
@@ -719,13 +726,15 @@ class CisTargetPruner:
         Args:
             module_gene_indices: (n_module_genes,) indices of genes in module
             weights: Optional (n_module_genes,) gene weights
+            tf_name: TF name for TF-specific annotation filtering (matching
+                     pySCENIC behavior). If None, keeps motifs with any annotation.
 
         Returns:
             Dict with pruning results (all tensors)
         """
         if self._multi_db_mode:
             raise ValueError("prune() is for single database mode. Use prune_modules() for multiple databases.")
-        
+
         if self.rankings is None:
             raise ValueError("Database not loaded")
 
@@ -747,16 +756,17 @@ class CisTargetPruner:
             self.nes_threshold,
             weights
         )
-        
+
         # Apply annotation filtering if enabled
         if self.motif_annotations is not None and self.filter_for_annotation:
             result = filter_by_annotations(
                 result,
                 self.motif_names,
                 self.motif_annotations,
-                filter_for_annotation=self.filter_for_annotation
+                filter_for_annotation=self.filter_for_annotation,
+                tf_name=tf_name
             )
-        
+
         return result
 
     def prune_batch(
@@ -853,8 +863,8 @@ class CisTargetPruner:
                 # Get weights if provided
                 weights = weights_list[module_idx] if weights_list else None
                 
-                # Prune
-                result = pruner.prune(db_indices, weights)
+                # Prune (pass tf_name for TF-specific annotation filtering)
+                result = pruner.prune(db_indices, weights, tf_name=tf_name)
                 
                 # Check for enriched motifs
                 n_enriched = result['enriched_mask'].sum().item()

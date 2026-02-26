@@ -1,3 +1,4 @@
+setup_paper_env.sh
 dist/
 ctxcore/
 pySCENIC/

@@ -136,6 +136,71 @@ def select_threshold_targets(
     return output
 
 
+def select_top_n_per_target(
+    adj: ArrayLike,
+    n: int = 5,
+    include_tf: bool = True,
+    tf_indices: Optional[ArrayLike] = None,
+    device: str = 'cuda'
+) -> torch.Tensor:
+    """
+    Select top-N regulators per target gene, then regroup by TF.
+
+    For each target gene, finds its N strongest regulators (TFs). The result
+    is regrouped back into the standard (n_tfs, n_genes) layout. This is the
+    inverted view used by pySCENIC's "top N per target" module type.
+
+    Parameters
+    ----------
+    adj : array-like
+        Adjacency matrix (n_tfs x n_genes) with edge weights
+    n : int, default=5
+        Number of top regulators to select per target gene
+    include_tf : bool, default=True
+        Include TF itself in its module (sets diagonal to 1 if tf_indices provided)
+    tf_indices : array-like, optional
+        Index of each TF in the gene list. Required if include_tf=True and
+        TFs are part of the gene set.
+    device : str, default='cuda'
+        Device for computation
+
+    Returns
+    -------
+    torch.Tensor
+        Filtered adjacency matrix with only top-N-per-target entries
+        Shape: (n_tfs, n_genes)
+    """
+    if isinstance(adj, np.ndarray):
+        adj = torch.from_numpy(adj)
+    adj = adj.to(device=device, dtype=torch.float32)
+
+    n_tfs, n_genes = adj.shape
+
+    # Transpose to (n_genes, n_tfs): each row is a target gene, columns are TFs
+    adj_t = adj.t()
+
+    # Top-k along TF dimension for each target gene
+    topk_values, topk_indices = torch.topk(adj_t, min(n, n_tfs), dim=1)
+
+    # Scatter back into sparse transposed matrix
+    output_t = torch.zeros_like(adj_t)
+    output_t.scatter_(1, topk_indices, topk_values)
+
+    # Transpose back to (n_tfs, n_genes)
+    output = output_t.t()
+
+    # Include TF in its own module
+    if include_tf and tf_indices is not None:
+        if isinstance(tf_indices, np.ndarray):
+            tf_indices = torch.from_numpy(tf_indices)
+        tf_indices = tf_indices.to(device=device, dtype=torch.long)
+        for i, tf_idx in enumerate(tf_indices):
+            if tf_idx < n_genes:
+                output[i, tf_idx] = 1.0
+
+    return output
+
+
 def filter_by_min_targets(
     adj: ArrayLike,
     min_targets: int = 20,
