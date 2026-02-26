@@ -65,6 +65,7 @@ flashscenic.cistarget.filter_by_annotations
 ```{autodoc2-summary}
 flashscenic.modules.select_topk_targets
 flashscenic.modules.select_threshold_targets
+flashscenic.modules.select_top_n_per_target
 flashscenic.modules.filter_by_min_targets
 flashscenic.modules.filter_by_mapped_fraction
 flashscenic.modules.get_target_indices
@@ -76,6 +77,9 @@ flashscenic.modules.to_numpy
 ```
 
 ```{autodoc2-object} flashscenic.modules.select_threshold_targets
+```
+
+```{autodoc2-object} flashscenic.modules.select_top_n_per_target
 ```
 
 ```{autodoc2-object} flashscenic.modules.filter_by_min_targets
@@ -91,6 +95,11 @@ flashscenic.modules.to_numpy
 ```
 
 ```{autodoc2-object} flashscenic.modules.to_numpy
+```
+
+## Analysis
+
+```{autodoc2-object} flashscenic.rss.regulon_specificity_scores
 ```
 
 ## Helpers

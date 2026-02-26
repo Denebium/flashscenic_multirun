@@ -13,15 +13,10 @@ flashscenic replaces the bottleneck steps in the [SCENIC](https://scenic.aertsla
 pip install flashscenic
 ```
 
-For documentation development:
-```bash
-pip install flashscenic[docs]
-```
-
 **Requirements:** Python 3.9+, PyTorch with CUDA support (CPU fallback available).
 
 ## Quick Start
-We provide a pipeline function `run_flashscenic` that is capable to cover 90% of use cases. 
+We provide a pipeline function `run_flashscenic` that is capable to cover 90% of use cases.
 
 ```python
 import flashscenic as fs
@@ -34,6 +29,9 @@ result = fs.run_flashscenic(exp_matrix, gene_names, species='human')
 # Results
 auc_scores = result['auc_scores']       # (n_cells, n_regulons)
 regulon_names = result['regulon_names']  # regulon labels
+regulons = result['regulons']            # list of dicts with gene members
+regulon_adj = result['regulon_adj']      # (n_regulons, n_genes) adjacency
+params = result['parameters']            # dict of all parameters used
 ```
 
 Required resource files (TF lists, ranking databases, motif annotations) are downloaded automatically on first run.
@@ -85,13 +83,15 @@ adj_matrix = trainer.get_adj()
 # 2. Filter to known TFs and sparsify
 # (load your TF list, subset adj_matrix rows, zero out weak edges)
 
-# 3. Module filtering
-filtered_adj = fs.select_topk_targets(adj_matrix, k=50, device='cuda')
-filtered_adj, tf_mask = fs.filter_by_min_targets(
-    filtered_adj, min_targets=20, min_fraction=0.8
-)
+# 3. Module filtering (multiple module types per TF)
+topk_adj = fs.select_topk_targets(adj_matrix, k=50, device='cuda')
+pct_adj = fs.select_threshold_targets(adj_matrix, percentile=75, device='cuda')
+topn_adj = fs.select_top_n_per_target(adj_matrix, n=50, device='cuda')
 
-# 4. cisTarget pruning
+# Filter TFs with too few targets
+topk_adj, tf_mask = fs.filter_by_min_targets(topk_adj, min_targets=20)
+
+# 4. cisTarget pruning (supports multiple databases)
 pruner = fs.CisTargetPruner(device='cuda')
 pruner.load_database(['db_500bp.feather', 'db_10kb.feather'])
 pruner.load_annotations('motifs.tbl', filter_for_annotation=True)
@@ -109,8 +109,8 @@ auc_scores = fs.get_aucell(exp_matrix, regulon_adj, k=50, device='cuda')
 | Prefix | Stage | Key Parameters |
 |--------|-------|----------------|
 | `grn_` | RegDiffusion | `grn_n_steps`, `grn_sparsity_threshold` |
-| `module_` | Module filtering | `module_k`, `module_min_targets`, `module_min_fraction` |
-| `pruning_` | cisTarget | `pruning_rank_threshold`, `pruning_nes_threshold`, `pruning_merge_strategy` |
+| `module_` | Module filtering | `module_k`, `module_percentile_thresholds`, `module_top_n_per_target`, `module_min_targets`, `module_min_fraction`, `module_include_tf` |
+| `pruning_` | cisTarget | `pruning_rank_threshold`, `pruning_auc_threshold`, `pruning_nes_threshold`, `pruning_min_genes`, `pruning_merge_strategy` |
 | `annotation_` | Motif filtering | `annotation_motif_similarity_fdr`, `annotation_orthologous_identity` |
 | `aucell_` | AUCell scoring | `aucell_k`, `aucell_auc_threshold`, `aucell_batch_size` |
 
@@ -133,11 +133,17 @@ result = fs.run_flashscenic(
 | Function / Class | Description |
 |-----------------|-------------|
 | `run_flashscenic()` | Full pipeline in one call |
-| `download_data()` | Download cistarget resource files |
+| `download_data()` | Download cisTarget resource files |
+| `list_available_resources()` | List all available resource sets |
 | `get_aucell()` | GPU-accelerated AUCell scoring |
-| `CisTargetPruner` | GPU cisTarget motif pruning |
+| `CisTargetPruner` | GPU cisTarget motif pruning (single or multi-database) |
+| `MotifAnnotation` | Load and query motif annotation files |
 | `select_topk_targets()` | Top-k module filtering |
-| `filter_by_min_targets()` | Min-target module filtering |
+| `select_threshold_targets()` | Percentile-based module filtering |
+| `select_top_n_per_target()` | Top-N regulators per target gene |
+| `filter_by_min_targets()` | Filter TFs by minimum target count |
+| `filter_by_mapped_fraction()` | Filter TFs by database mapping fraction |
+| `regulon_specificity_scores()` | Regulon Specificity Scores (RSS) per cell type |
 | `regulons_to_adjacency()` | Convert regulons to adjacency matrix |
 
 ## Authors

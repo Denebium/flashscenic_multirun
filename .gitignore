@@ -2,7 +2,6 @@ setup_paper_env.sh
 dist/
 ctxcore/
 pySCENIC/
-experiments/
 /data/
 results/
 result_logs/
@@ -22,3 +21,6 @@ fetal-mac-edlow_preprocess.ipynb
 CLAUDE.md
 .claude/
 TODO.md
+.csv
+.txt
+experiments/

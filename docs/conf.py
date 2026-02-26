@@ -1,16 +1,19 @@
 """Sphinx configuration for flashscenic documentation."""
 
 project = "flashscenic"
-copyright = "2025, Hao Zhu, Donna Slonim"
+copyright = "2025-2026, Hao Zhu, Donna Slonim"
 author = "Hao Zhu, Donna Slonim"
-version = "0.0.2"
+version = "0.2.0"
 
 extensions = [
-    "myst_parser",
+    "myst_nb",
     "autodoc2",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
 ]
+
+# Notebook settings: render pre-executed notebooks without re-running
+nb_execution_mode = "off"
 
 # MyST settings
 myst_enable_extensions = [
@@ -37,6 +40,7 @@ html_title = "flashscenic"
 source_suffix = {
     ".rst": "restructuredtext",
     ".md": "markdown",
+    ".ipynb": "myst-nb",
 }
 
 # Exclude patterns

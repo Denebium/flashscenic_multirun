@@ -27,6 +27,7 @@ auc_scores = result['auc_scores']  # (n_cells, n_regulons)
 
 installation
 quickstart
+tutorial
 pipeline
 ```
 

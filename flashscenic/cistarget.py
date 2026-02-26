@@ -488,19 +488,12 @@ def prune_single_module(
     std_rcc = rccs.std(dim=0, unbiased=False)
     avg2std_rcc = avg_rcc + 2.0 * std_rcc
 
-    # Get module gene rankings for all motifs
-    module_rankings = rankings[:, module_gene_indices]  # (n_motifs, n_module_genes)
-
-    # Compute leading edge for enriched motifs
-    leading_edge_masks = torch.zeros((n_enriched, n_module_genes), dtype=torch.bool, device=device)
-    rank_at_max = torch.zeros(n_enriched, dtype=torch.long, device=device)
-
-    for i, motif_idx in enumerate(enriched_indices):
-        mask, _, r_max = compute_leading_edge(
-            rccs[motif_idx], avg2std_rcc, module_rankings[motif_idx], weights
-        )
-        leading_edge_masks[i] = mask
-        rank_at_max[i] = r_max
+    # Vectorized leading edge: only gather rankings for enriched motifs
+    enriched_module_rankings = rankings[enriched_indices][:, module_gene_indices]
+    enriched_rccs = rccs[enriched_indices]  # (n_enriched, rank_threshold)
+    diff = enriched_rccs - avg2std_rcc.unsqueeze(0)  # (n_enriched, rank_threshold)
+    rank_at_max = diff.argmax(dim=1)  # (n_enriched,)
+    leading_edge_masks = enriched_module_rankings <= rank_at_max.unsqueeze(1)
 
     result['leading_edge_masks'] = leading_edge_masks
     result['rank_at_max'] = rank_at_max
@@ -848,21 +841,32 @@ class CisTargetPruner:
         
         all_regulons = []
         
+        # Pre-transfer all modules to CPU numpy once (avoid repeated GPU→CPU copies)
+        modules_np = [m.cpu().numpy() for m in modules]
+
         # Prune modules for each database
         for db_idx, (pruner, db_name) in enumerate(zip(self.pruners, self.database_names)):
             print(f"\nPruning with database {db_idx + 1}/{len(self.pruners)}: {db_name}")
-            
-            for module_idx, (module_indices, tf_name) in enumerate(zip(modules, tf_names)):
-                # Convert gene indices to names, then to database indices
-                target_genes = [gene_names[idx] for idx in module_indices.cpu().numpy()]
-                db_indices = pruner.genes_to_indices(target_genes)
-                
-                if len(db_indices) < 20:  # Skip if too few genes mapped
+
+            # Precompute gene name → DB index mapping once per database
+            gene_to_db_mapping = np.full(len(gene_names), -1, dtype=np.int64)
+            for i, name in enumerate(gene_names):
+                if name in pruner.gene_to_idx:
+                    gene_to_db_mapping[i] = pruner.gene_to_idx[name]
+
+            for module_idx, (module_np, tf_name) in enumerate(zip(modules_np, tf_names)):
+                # Vectorized gene index conversion using precomputed mapping
+                mapped_indices = gene_to_db_mapping[module_np]
+                mapped_indices = mapped_indices[mapped_indices >= 0]
+
+                if len(mapped_indices) < 20:  # Skip if too few genes mapped
                     continue
-                
+
+                db_indices = torch.tensor(mapped_indices, device=self.device, dtype=torch.long)
+
                 # Get weights if provided
                 weights = weights_list[module_idx] if weights_list else None
-                
+
                 # Prune (pass tf_name for TF-specific annotation filtering)
                 result = pruner.prune(db_indices, weights, tf_name=tf_name)
                 

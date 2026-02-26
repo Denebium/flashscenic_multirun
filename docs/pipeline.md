@@ -49,11 +49,18 @@ Loads a known transcription factor list and subsets the adjacency matrix to rows
 
 ## Step 3: Module Filtering
 
-Selects top target genes per TF and filters out TFs with too few targets.
+Generates multiple module types per TF (matching pySCENIC's strategy) and filters out TFs with too few targets.
+
+By default, the pipeline creates three kinds of modules for each TF:
+- **Top-k**: The top `module_k` targets by adjacency weight (e.g., top50)
+- **Percentile**: Targets above each percentile threshold in `module_percentile_thresholds` (e.g., pct75)
+- **Top-N per target**: The top N regulators per target gene, regrouped by TF (e.g., top5perTarget, top10perTarget, top50perTarget)
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `module_k` | 50 | Top k target genes per TF |
+| `module_percentile_thresholds` | (75,) | Percentile cutoffs for percentile-based modules |
+| `module_top_n_per_target` | (5, 10, 50) | N values for top-N-per-target modules |
 | `module_min_targets` | 20 | Minimum absolute target count |
 | `module_min_fraction` | None | Minimum fraction of targets required (pySCENIC 80% rule) |
 | `module_include_tf` | True | Include TF in its own module |
@@ -62,6 +69,7 @@ Selects top target genes per TF and filters out TFs with too few targets.
 - Increase `module_k` (e.g., 100) for broader modules
 - Lower `module_min_targets` if few TFs survive filtering
 - Set `module_min_fraction=None` to disable the fraction-based filter
+- Multiple module types increase the chance of detecting motif enrichment; set `module_percentile_thresholds=()` and `module_top_n_per_target=()` to use only top-k modules
 
 ## Step 4: cisTarget Pruning
 

@@ -13,6 +13,7 @@ from .cistarget import (
     compute_nes,
     prune_single_module,
 )
+from .rss import regulon_specificity_scores
 from .modules import (
     select_topk_targets,
     select_threshold_targets,
@@ -74,6 +75,8 @@ __all__ = [
     'compute_recovery_aucs',
     'compute_nes',
     'prune_single_module',
+    # Analysis
+    'regulon_specificity_scores',
     # Module selection
     'select_topk_targets',
     'select_threshold_targets',
