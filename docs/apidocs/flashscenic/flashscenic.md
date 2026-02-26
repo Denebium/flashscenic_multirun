@@ -13,11 +13,12 @@
 :titlesonly:
 :maxdepth: 1
 
-flashscenic.data
 flashscenic.aucell
 flashscenic.cistarget
-flashscenic.pipeline
+flashscenic.data
 flashscenic.modules
+flashscenic.pipeline
+flashscenic.rss
 ```
 
 ## Package Contents

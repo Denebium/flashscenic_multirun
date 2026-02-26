@@ -23,6 +23,10 @@
   - ```{autodoc2-docstring} flashscenic.modules.select_threshold_targets
     :summary:
     ```
+* - {py:obj}`select_top_n_per_target <flashscenic.modules.select_top_n_per_target>`
+  - ```{autodoc2-docstring} flashscenic.modules.select_top_n_per_target
+    :summary:
+    ```
 * - {py:obj}`filter_by_min_targets <flashscenic.modules.filter_by_min_targets>`
   - ```{autodoc2-docstring} flashscenic.modules.filter_by_min_targets
     :summary:
@@ -83,7 +87,14 @@
 ```
 ````
 
-````{py:function} filter_by_min_targets(adj: flashscenic.modules.ArrayLike, min_targets: int = 20, min_fraction: typing.Optional[float] = 0.8, device: str = 'cuda') -> typing.Tuple[torch.Tensor, torch.Tensor]
+````{py:function} select_top_n_per_target(adj: flashscenic.modules.ArrayLike, n: int = 5, include_tf: bool = True, tf_indices: typing.Optional[flashscenic.modules.ArrayLike] = None, device: str = 'cuda') -> torch.Tensor
+:canonical: flashscenic.modules.select_top_n_per_target
+
+```{autodoc2-docstring} flashscenic.modules.select_top_n_per_target
+```
+````
+
+````{py:function} filter_by_min_targets(adj: flashscenic.modules.ArrayLike, min_targets: int = 20, min_fraction: typing.Optional[float] = None, device: str = 'cuda') -> typing.Tuple[torch.Tensor, torch.Tensor]
 :canonical: flashscenic.modules.filter_by_min_targets
 
 ```{autodoc2-docstring} flashscenic.modules.filter_by_min_targets

@@ -36,12 +36,8 @@ html_theme_options = {
 }
 html_title = "flashscenic"
 
-# Source suffix
-source_suffix = {
-    ".rst": "restructuredtext",
-    ".md": "markdown",
-    ".ipynb": "myst-nb",
-}
+# Source suffix — myst-nb auto-registers .md and .ipynb parsers
+source_suffix = [".rst", ".md", ".ipynb"]
 
 # Exclude patterns
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]

@@ -34,7 +34,7 @@
 ```
 ````
 
-````{py:function} _compute_auc(target_rankings, rank_cutoff, k, max_auc)
+````{py:function} _compute_auc(target_rankings, weights, target_mask, rank_cutoff, max_aucs)
 :canonical: flashscenic.aucell._compute_auc
 
 ```{autodoc2-docstring} flashscenic.aucell._compute_auc

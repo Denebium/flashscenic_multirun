@@ -296,24 +296,6 @@ def run_flashscenic(
 
     _log(f"  {total_modules} total modules across all types")
 
-    # Deduplicate: same TF + same gene set → prune once.
-    # Different module types often produce identical gene sets for the same TF.
-    # Since cisTarget merges regulons by TF anyway, duplicates yield identical results.
-    seen = {}
-    deduped_modules = []
-    deduped_tf_names = []
-    for module_indices, tf_name in zip(modules, valid_tf_names):
-        key = (tf_name, module_indices.cpu().numpy().tobytes())
-        if key not in seen:
-            seen[key] = True
-            deduped_modules.append(module_indices)
-            deduped_tf_names.append(tf_name)
-    if len(deduped_modules) < total_modules:
-        _log(f"  Deduplicated: {total_modules} → {len(deduped_modules)} unique modules")
-    modules = deduped_modules
-    valid_tf_names = deduped_tf_names
-    total_modules = len(modules)
-
     if total_modules == 0:
         raise ValueError(
             "No TF modules survived filtering. Consider lowering "

@@ -138,7 +138,7 @@
 
 `````
 
-````{py:function} filter_by_annotations(result: typing.Dict[str, torch.Tensor], motif_names: typing.List[str], motif_annotations: typing.Optional[flashscenic.cistarget.MotifAnnotation], filter_for_annotation: bool = True) -> typing.Dict[str, torch.Tensor]
+````{py:function} filter_by_annotations(result: typing.Dict[str, torch.Tensor], motif_names: typing.List[str], motif_annotations: typing.Optional[flashscenic.cistarget.MotifAnnotation], filter_for_annotation: bool = True, tf_name: typing.Optional[str] = None) -> typing.Dict[str, torch.Tensor]
 :canonical: flashscenic.cistarget.filter_by_annotations
 
 ```{autodoc2-docstring} flashscenic.cistarget.filter_by_annotations
@@ -203,7 +203,7 @@
 
 ````
 
-````{py:method} prune(module_gene_indices: flashscenic.cistarget.ArrayLike, weights: typing.Optional[flashscenic.cistarget.ArrayLike] = None) -> typing.Dict[str, torch.Tensor]
+````{py:method} prune(module_gene_indices: flashscenic.cistarget.ArrayLike, weights: typing.Optional[flashscenic.cistarget.ArrayLike] = None, tf_name: typing.Optional[str] = None) -> typing.Dict[str, torch.Tensor]
 :canonical: flashscenic.cistarget.CisTargetPruner.prune
 
 ```{autodoc2-docstring} flashscenic.cistarget.CisTargetPruner.prune
