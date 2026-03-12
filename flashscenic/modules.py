@@ -422,6 +422,294 @@ def binarize(adj: ArrayLike, device: str = 'cuda') -> torch.Tensor:
     return (adj > 0).float()
 
 
+def select_mixture_model_targets(
+    adj: ArrayLike,
+    n_components: int = 2,
+    method: str = 'intersection',
+    include_tf: bool = True,
+    tf_indices: Optional[ArrayLike] = None,
+    device: str = 'cuda'
+) -> Tuple[torch.Tensor, dict]:
+    """
+    Select targets using Gaussian mixture model to separate signal from noise.
+
+    Fits a GMM to the non-zero edge weights across the full adjacency matrix.
+    The threshold is derived from the fitted components, providing a data-driven
+    alternative to fixed thresholds like ``adj[adj < 1.0] = 0``.
+
+    Parameters
+    ----------
+    adj : array-like
+        Adjacency matrix (n_tfs x n_genes) with edge weights.
+    n_components : int, default=2
+        Number of Gaussian components (2 = noise + signal).
+    method : str, default='intersection'
+        How to derive the threshold from the fitted GMM:
+
+        - ``'intersection'``: weight where the posterior probabilities of the
+          two components cross (between the two means).
+        - ``'posterior'``: keep edges with P(signal | weight) > 0.5.
+        - ``'noise_quantile'``: noise_mean + 2 * noise_std.
+    include_tf : bool, default=True
+        Include TF itself in its module.
+    tf_indices : array-like, optional
+        Index of each TF in the gene list.
+    device : str, default='cuda'
+        Device for output tensor.
+
+    Returns
+    -------
+    Tuple[torch.Tensor, dict]
+        - Filtered adjacency matrix (n_tfs, n_genes) on *device*.
+        - Info dict with keys: ``threshold``, ``means``, ``stds``,
+          ``weights``, ``converged``, ``method``.
+    """
+    from sklearn.mixture import GaussianMixture
+    from scipy.optimize import brentq
+
+    if isinstance(adj, torch.Tensor):
+        adj_np = adj.detach().cpu().numpy()
+    else:
+        adj_np = np.asarray(adj, dtype=np.float32)
+
+    # Collect non-zero weights
+    nonzero = adj_np[adj_np > 0].reshape(-1, 1)
+    if len(nonzero) == 0:
+        adj_t = torch.zeros_like(
+            torch.from_numpy(adj_np)).to(device=device, dtype=torch.float32)
+        return adj_t, {
+            'threshold': 0.0, 'means': [], 'stds': [], 'weights': [],
+            'converged': False, 'method': method,
+        }
+
+    # Fit GMM
+    gmm = GaussianMixture(
+        n_components=n_components, random_state=42, n_init=10,
+    )
+    gmm.fit(nonzero)
+
+    means = gmm.means_.flatten()
+    stds = np.sqrt(gmm.covariances_.flatten())
+    mix_weights = gmm.weights_.flatten()
+
+    # Identify noise (lower mean) and signal (higher mean) components
+    order = np.argsort(means)
+    noise_idx, signal_idx = order[0], order[-1]
+
+    if method == 'intersection':
+        # Find where posterior probabilities cross between the two means
+        lo, hi = means[noise_idx], means[signal_idx]
+        if lo >= hi:
+            threshold = float(lo)
+        else:
+            def _posterior_diff(x):
+                pts = np.array([[x]])
+                probs = gmm.predict_proba(pts)[0]
+                return probs[signal_idx] - probs[noise_idx]
+            try:
+                threshold = float(brentq(_posterior_diff, lo, hi))
+            except ValueError:
+                # Fallback: midpoint
+                threshold = float((lo + hi) / 2)
+
+    elif method == 'posterior':
+        # Keep edges where P(signal | weight) > 0.5
+        probs = gmm.predict_proba(nonzero)
+        # Threshold is the minimum weight with signal prob > 0.5
+        signal_mask = probs[:, signal_idx] > 0.5
+        if signal_mask.any():
+            threshold = float(nonzero[signal_mask].min())
+        else:
+            threshold = float(nonzero.max()) + 1.0  # nothing passes
+
+    elif method == 'noise_quantile':
+        threshold = float(means[noise_idx] + 2.0 * stds[noise_idx])
+
+    else:
+        raise ValueError(f"Unknown method: {method!r}. "
+                         f"Choose from 'intersection', 'posterior', 'noise_quantile'.")
+
+    # Apply threshold on GPU
+    adj_t = torch.from_numpy(adj_np).to(device=device, dtype=torch.float32)
+    output = torch.where(adj_t >= threshold, adj_t, torch.zeros_like(adj_t))
+
+    # Include TF in its own module
+    if include_tf and tf_indices is not None:
+        if isinstance(tf_indices, np.ndarray):
+            tf_indices = torch.from_numpy(tf_indices)
+        tf_indices = tf_indices.to(device=device, dtype=torch.long)
+        n_genes = adj_t.shape[1]
+        for i, tf_idx in enumerate(tf_indices):
+            if tf_idx < n_genes:
+                output[i, tf_idx] = 1.0
+
+    info = {
+        'threshold': threshold,
+        'means': means.tolist(),
+        'stds': stds.tolist(),
+        'weights': mix_weights.tolist(),
+        'converged': gmm.converged_,
+        'method': method,
+    }
+    return output, info
+
+
+def select_knee_targets(
+    adj: ArrayLike,
+    sensitivity: float = 1.0,
+    per_tf: bool = False,
+    include_tf: bool = True,
+    tf_indices: Optional[ArrayLike] = None,
+    device: str = 'cuda'
+) -> Tuple[torch.Tensor, dict]:
+    """
+    Select targets using knee/elbow detection on the sorted edge weight curve.
+
+    Sorts non-zero edge weights in descending order and finds the "knee" point
+    where the rate of decrease changes most sharply. This provides a data-driven
+    threshold without assuming a parametric distribution.
+
+    Parameters
+    ----------
+    adj : array-like
+        Adjacency matrix (n_tfs x n_genes) with edge weights.
+    sensitivity : float, default=1.0
+        Controls how aggressively the knee is detected. Higher values detect
+        the knee earlier (more aggressive pruning). Values in [0.5, 3.0] are
+        typical.
+    per_tf : bool, default=False
+        If True, find a separate knee per TF row. If False, find a single
+        global knee across all weights.
+    include_tf : bool, default=True
+        Include TF itself in its module.
+    tf_indices : array-like, optional
+        Index of each TF in the gene list.
+    device : str, default='cuda'
+        Device for output tensor.
+
+    Returns
+    -------
+    Tuple[torch.Tensor, dict]
+        - Filtered adjacency matrix (n_tfs, n_genes) on *device*.
+        - Info dict with keys:
+
+          - ``threshold``: float (global) or list of float (per-TF)
+          - ``knee_index``: int or list of int
+          - ``per_tf``: bool
+    """
+    if isinstance(adj, torch.Tensor):
+        adj_np = adj.detach().cpu().numpy()
+    else:
+        adj_np = np.asarray(adj, dtype=np.float32)
+
+    n_tfs, n_genes = adj_np.shape
+
+    def _find_knee(values_sorted_desc: np.ndarray, S: float) -> Tuple[float, int]:
+        """Find knee in a sorted (descending) 1-D array. Returns (threshold, index)."""
+        n = len(values_sorted_desc)
+        if n == 0:
+            return 0.0, 0
+        if n == 1:
+            return float(values_sorted_desc[0]), 0
+
+        # Normalize to [0, 1]
+        x = np.linspace(0, 1, n)
+        y_min, y_max = values_sorted_desc[-1], values_sorted_desc[0]
+        y_range = y_max - y_min
+        if y_range <= 0:
+            return float(values_sorted_desc[0]), 0
+        y = (values_sorted_desc - y_min) / y_range
+
+        # Difference from the diagonal (line from first to last point)
+        diagonal = 1.0 - x  # descending: starts at 1, ends at 0
+        diff = y - diagonal
+
+        # Knee: point of maximum positive difference, adjusted by sensitivity
+        # Smooth the difference curve with a small window to reduce noise
+        if n > 10:
+            kernel_size = max(3, n // 50)
+            if kernel_size % 2 == 0:
+                kernel_size += 1
+            pad = kernel_size // 2
+            diff_padded = np.pad(diff, pad, mode='edge')
+            diff_smooth = np.convolve(
+                diff_padded, np.ones(kernel_size) / kernel_size, mode='valid',
+            )[:n]
+        else:
+            diff_smooth = diff
+
+        # Scale by sensitivity: higher S → earlier knee detection
+        threshold_line = S * (1.0 / n)
+        knee_candidates = np.where(diff_smooth < threshold_line)[0]
+
+        if len(knee_candidates) == 0:
+            knee_idx = n - 1
+        else:
+            # First point where diff drops below threshold
+            knee_idx = int(knee_candidates[0])
+
+        knee_idx = max(0, min(knee_idx, n - 1))
+        return float(values_sorted_desc[knee_idx]), int(knee_idx)
+
+    if per_tf:
+        thresholds = []
+        knee_indices = []
+        adj_t = torch.from_numpy(adj_np).to(device=device, dtype=torch.float32)
+        output = torch.zeros_like(adj_t)
+
+        for i in range(n_tfs):
+            row = adj_np[i]
+            nonzero = row[row > 0]
+            if len(nonzero) == 0:
+                thresholds.append(0.0)
+                knee_indices.append(0)
+                continue
+            sorted_desc = np.sort(nonzero)[::-1].copy()
+            thr, ki = _find_knee(sorted_desc, sensitivity)
+            thresholds.append(thr)
+            knee_indices.append(ki)
+            mask = adj_t[i] >= thr
+            output[i] = torch.where(mask, adj_t[i], torch.zeros_like(adj_t[i]))
+
+        info = {
+            'threshold': thresholds,
+            'knee_index': knee_indices,
+            'per_tf': True,
+        }
+    else:
+        nonzero = adj_np[adj_np > 0]
+        if len(nonzero) == 0:
+            adj_t = torch.zeros(n_tfs, n_genes, device=device, dtype=torch.float32)
+            return adj_t, {'threshold': 0.0, 'knee_index': 0, 'per_tf': False}
+
+        sorted_desc = np.sort(nonzero)[::-1].copy()
+        threshold, knee_idx = _find_knee(sorted_desc, sensitivity)
+
+        adj_t = torch.from_numpy(adj_np).to(device=device, dtype=torch.float32)
+        output = torch.where(adj_t >= threshold, adj_t, torch.zeros_like(adj_t))
+
+        info = {
+            'threshold': threshold,
+            'knee_index': knee_idx,
+            'per_tf': False,
+        }
+
+    # Include TF in its own module
+    if include_tf and tf_indices is not None:
+        if isinstance(tf_indices, np.ndarray):
+            tf_indices_t = torch.from_numpy(tf_indices)
+        elif isinstance(tf_indices, torch.Tensor):
+            tf_indices_t = tf_indices
+        else:
+            tf_indices_t = torch.tensor(tf_indices)
+        tf_indices_t = tf_indices_t.to(device=device, dtype=torch.long)
+        for i, tf_idx in enumerate(tf_indices_t):
+            if tf_idx < n_genes:
+                output[i, tf_idx] = 1.0
+
+    return output, info
+
+
 def to_numpy(tensor: torch.Tensor) -> np.ndarray:
     """Convert tensor to numpy array."""
     return tensor.detach().cpu().numpy()

@@ -23,6 +23,8 @@ from .modules import (
     get_target_indices,
     binarize,
     to_numpy,
+    select_mixture_model_targets,
+    select_knee_targets,
 )
 
 
@@ -86,4 +88,6 @@ __all__ = [
     'get_target_indices',
     'binarize',
     'to_numpy',
+    'select_mixture_model_targets',
+    'select_knee_targets',
 ]
