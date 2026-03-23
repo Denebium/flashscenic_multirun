@@ -1,0 +1,715 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="500" viewBox="0 0 940 500">
+  <rect width="100%" height="100%" fill="white"/>
+  <defs>
+    <style>
+      text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+      .mono { font-family: 'SF Mono', 'Fira Code', Consolas, monospace; }
+    </style>
+    <marker id="arr-g" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#9CA3AF"/></marker>
+    <marker id="arr-b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#3B82F6"/></marker>
+    <marker id="arr-b2" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><polygon points="0 0,6 2,0 4" fill="#3B82F6"/></marker>
+  </defs>
+
+  <!-- Figure title -->
+  <text x="0" y="30" font-size="17" font-weight="600" fill="#111827" letter-spacing="-0.17">Key algorithmic and architectural innovations in flashscenic</text>
+
+  <!-- ============================================================ -->
+  <!-- PANEL A: Pipeline Overview (full width)                       -->
+  <!-- ============================================================ -->
+  <svg x="0" y="46" width="940" height="188" viewBox="0 0 940 188">
+
+    <text x="4" y="14" font-size="16" font-weight="700" fill="#111827">a</text>
+    <text x="24" y="14" font-size="12" font-weight="600" fill="#374151">End-to-end pipeline comparison</text>
+
+    <!-- pySCENIC row -->
+    <g transform="translate(0,22)">
+      <rect x="4" y="16" width="82" height="20" rx="10" fill="#D6604D" opacity="0.12"/>
+      <text x="45" y="30" text-anchor="middle" font-size="9.5" font-weight="600" fill="#D6604D">pySCENIC</text>
+
+      <rect x="100" y="4" width="180" height="52" rx="5" fill="white" stroke="#D6604D" stroke-width="1.2"/>
+      <text x="190" y="22" text-anchor="middle" font-size="10" font-weight="600" fill="#991B1B">GRN Inference</text>
+      <text x="190" y="35" text-anchor="middle" font-size="8.5" fill="#6B7280">GRNBoost2 / GENIE3</text>
+      <rect x="162" y="40" width="56" height="12" rx="6" fill="#9CA3AF" opacity="0.15"/>
+      <text x="190" y="50" text-anchor="middle" font-size="7.5" font-weight="600" fill="#6B7280">CPU</text>
+
+      <line x1="286" y1="30" x2="306" y2="30" stroke="#9CA3AF" stroke-width="1" marker-end="url(#arr-g)"/>
+
+      <rect x="314" y="4" width="180" height="52" rx="5" fill="white" stroke="#D6604D" stroke-width="1.2"/>
+      <text x="404" y="22" text-anchor="middle" font-size="10" font-weight="600" fill="#991B1B">Module Creation</text>
+      <text x="404" y="35" text-anchor="middle" font-size="8.5" fill="#6B7280">Pandas groupby + percentile</text>
+      <rect x="376" y="40" width="56" height="12" rx="6" fill="#9CA3AF" opacity="0.15"/>
+      <text x="404" y="50" text-anchor="middle" font-size="7.5" font-weight="600" fill="#6B7280">CPU</text>
+
+      <line x1="500" y1="30" x2="520" y2="30" stroke="#9CA3AF" stroke-width="1" marker-end="url(#arr-g)"/>
+
+      <rect x="528" y="4" width="180" height="52" rx="5" fill="white" stroke="#D6604D" stroke-width="1.2"/>
+      <text x="618" y="22" text-anchor="middle" font-size="10" font-weight="600" fill="#991B1B">Motif Pruning</text>
+      <text x="618" y="35" text-anchor="middle" font-size="8.5" fill="#6B7280">cisTarget  (Dask + Numba)</text>
+      <rect x="590" y="40" width="56" height="12" rx="6" fill="#9CA3AF" opacity="0.15"/>
+      <text x="618" y="50" text-anchor="middle" font-size="7.5" font-weight="600" fill="#6B7280">CPU</text>
+
+      <line x1="714" y1="30" x2="734" y2="30" stroke="#9CA3AF" stroke-width="1" marker-end="url(#arr-g)"/>
+
+      <rect x="742" y="4" width="180" height="52" rx="5" fill="white" stroke="#D6604D" stroke-width="1.2"/>
+      <text x="832" y="22" text-anchor="middle" font-size="10" font-weight="600" fill="#991B1B">AUCell Scoring</text>
+      <text x="832" y="35" text-anchor="middle" font-size="8.5" fill="#6B7280">Numba JIT + multiprocessing</text>
+      <rect x="804" y="40" width="56" height="12" rx="6" fill="#9CA3AF" opacity="0.15"/>
+      <text x="832" y="50" text-anchor="middle" font-size="7.5" font-weight="600" fill="#6B7280">CPU</text>
+
+      <text x="100" y="71" font-size="8.5" fill="#991B1B">CLI (3 commands + file I/O) or Python API  ·  Dependencies: pandas, numba, dask, arboreto, ctxcore, pyarrow, ...</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="4" y1="101" x2="930" y2="101" stroke="#E5E7EB" stroke-width="0.8"/>
+
+    <!-- flashscenic row -->
+    <g transform="translate(0,106)">
+      <rect x="4" y="10" width="82" height="20" rx="10" fill="#3B82F6" opacity="0.12"/>
+      <text x="45" y="24" text-anchor="middle" font-size="9.5" font-weight="600" fill="#3B82F6">flashscenic</text>
+
+      <!-- GPU bar -->
+      <rect x="96" y="0" width="830" height="56" rx="8" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="0.8"/>
+      <rect x="96" y="0" width="830" height="13" rx="7" fill="#059669" opacity="0.07"/>
+      <text x="920" y="10" text-anchor="end" font-size="7.5" font-weight="600" fill="#059669">All computations on GPU  ·  Data stays in tensor memory</text>
+
+      <rect x="100" y="16" width="180" height="36" rx="5" fill="white" stroke="#3B82F6" stroke-width="1.2"/>
+      <text x="190" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#1E3A8A">GRN Inference</text>
+      <text x="190" y="42" text-anchor="middle" font-size="8.5" fill="#3B82F6">RegDiffusion (deep learning)</text>
+
+      <line x1="286" y1="34" x2="308" y2="34" stroke="#3B82F6" stroke-width="1" marker-end="url(#arr-b)"/>
+
+      <rect x="314" y="16" width="180" height="36" rx="5" fill="white" stroke="#3B82F6" stroke-width="1.2"/>
+      <text x="404" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#1E3A8A">Module Selection</text>
+      <text x="404" y="42" text-anchor="middle" font-size="8.5" fill="#3B82F6">GPU tensor topk / threshold</text>
+
+      <line x1="500" y1="34" x2="522" y2="34" stroke="#3B82F6" stroke-width="1" marker-end="url(#arr-b)"/>
+
+      <rect x="528" y="16" width="180" height="36" rx="5" fill="white" stroke="#3B82F6" stroke-width="1.2"/>
+      <text x="618" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#1E3A8A">Motif Pruning</text>
+      <text x="618" y="42" text-anchor="middle" font-size="8.5" fill="#3B82F6">Vectorized cisTarget</text>
+
+      <line x1="714" y1="34" x2="736" y2="34" stroke="#3B82F6" stroke-width="1" marker-end="url(#arr-b)"/>
+
+      <rect x="742" y="16" width="180" height="36" rx="5" fill="white" stroke="#3B82F6" stroke-width="1.2"/>
+      <text x="832" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#1E3A8A">AUCell Scoring</text>
+      <text x="832" y="42" text-anchor="middle" font-size="8.5" fill="#3B82F6">Batch cells  ×  all TFs</text>
+
+      <text x="100" y="68" font-size="8.5" fill="#1E3A8A" font-weight="500">Single call run_flashscenic() or separate steps</text>
+      <text x="380" y="68" font-size="8.5" fill="#6B7280">|</text>
+      <text x="392" y="68" font-size="8.5" fill="#2563EB">Dependencies: numpy, torch, regdiffusion</text>
+    </g>
+  </svg>
+
+  <!-- ============================================================ -->
+  <!-- PANEL B: Module Selection                                     -->
+  <!-- ============================================================ -->
+  <svg x="0" y="250" width="302" height="250" viewBox="0 0 375 310">
+    <text x="4" y="14" font-size="16" font-weight="700" fill="#111827">b</text>
+    <text x="24" y="14" font-size="12" font-weight="600" fill="#374151">Module selection: data representation</text>
+
+    <line x1="187" y1="24" x2="187" y2="186" stroke="#E5E7EB" stroke-width="0.8" stroke-dasharray="4,3"/>
+
+    <!-- LEFT: pySCENIC adjacency list -->
+    <g transform="translate(6,26)">
+      <rect x="18" y="0" width="72" height="16" rx="8" fill="#D6604D" opacity="0.12"/>
+      <text x="54" y="11" text-anchor="middle" font-size="8.5" font-weight="600" fill="#D6604D">pySCENIC</text>
+
+      <text x="6" y="27" font-size="8.5" font-weight="500" fill="#374151">Adjacency list (long table)</text>
+
+      <!-- Table header -->
+      <g transform="translate(6,32)">
+        <rect x="0" y="0" width="160" height="14" rx="2" fill="#F3F4F6"/>
+        <text x="28" y="10" text-anchor="middle" font-size="7" font-weight="600" fill="#4B5563">TF</text>
+        <text x="80" y="10" text-anchor="middle" font-size="7" font-weight="600" fill="#4B5563">Gene</text>
+        <text x="136" y="10" text-anchor="middle" font-size="7" font-weight="600" fill="#4B5563">Weight</text>
+        <line x1="54" y1="0" x2="54" y2="14" stroke="#E5E7EB" stroke-width="0.5"/>
+        <line x1="108" y1="0" x2="108" y2="14" stroke="#E5E7EB" stroke-width="0.5"/>
+
+        <!-- Group 1 -->
+        <rect x="0" y="15" width="160" height="36" rx="0" fill="#FEF2F2" opacity="0.5"/>
+        <rect x="0" y="15" width="160" height="12" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="28" y="24" text-anchor="middle" font-size="6.5" fill="#991B1B">STAT3</text>
+        <text x="80" y="24" text-anchor="middle" font-size="6.5" fill="#4B5563">TP53</text>
+        <text x="136" y="24" text-anchor="middle" font-size="6.5" fill="#4B5563" class="mono">0.82</text>
+        <line x1="54" y1="15" x2="54" y2="51" stroke="#E5E7EB" stroke-width="0.3"/>
+        <line x1="108" y1="15" x2="108" y2="51" stroke="#E5E7EB" stroke-width="0.3"/>
+
+        <rect x="0" y="27" width="160" height="12" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="28" y="36" text-anchor="middle" font-size="6.5" fill="#991B1B">STAT3</text>
+        <text x="80" y="36" text-anchor="middle" font-size="6.5" fill="#4B5563">BCL2</text>
+        <text x="136" y="36" text-anchor="middle" font-size="6.5" fill="#4B5563" class="mono">0.71</text>
+
+        <rect x="0" y="39" width="160" height="12" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="28" y="48" text-anchor="middle" font-size="6.5" fill="#991B1B">STAT3</text>
+        <text x="80" y="48" text-anchor="middle" font-size="6.5" fill="#4B5563">MYC</text>
+        <text x="136" y="48" text-anchor="middle" font-size="6.5" fill="#4B5563" class="mono">0.65</text>
+
+        <!-- Group 2 -->
+        <rect x="0" y="52" width="160" height="36" rx="0" fill="#FFF7ED" opacity="0.5"/>
+        <rect x="0" y="52" width="160" height="12" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="28" y="61" text-anchor="middle" font-size="6.5" fill="#9A3412">MYB</text>
+        <text x="80" y="61" text-anchor="middle" font-size="6.5" fill="#4B5563">GATA1</text>
+        <text x="136" y="61" text-anchor="middle" font-size="6.5" fill="#4B5563" class="mono">0.91</text>
+        <line x1="54" y1="52" x2="54" y2="88" stroke="#E5E7EB" stroke-width="0.3"/>
+        <line x1="108" y1="52" x2="108" y2="88" stroke="#E5E7EB" stroke-width="0.3"/>
+
+        <rect x="0" y="64" width="160" height="12" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="28" y="73" text-anchor="middle" font-size="6.5" fill="#9A3412">MYB</text>
+        <text x="80" y="73" text-anchor="middle" font-size="6.5" fill="#4B5563">KIT</text>
+        <text x="136" y="73" text-anchor="middle" font-size="6.5" fill="#4B5563" class="mono">0.78</text>
+
+        <rect x="0" y="76" width="160" height="12" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="28" y="85" text-anchor="middle" font-size="6.5" fill="#9A3412">MYB</text>
+        <text x="80" y="85" text-anchor="middle" font-size="6.5" fill="#4B5563">CD34</text>
+        <text x="136" y="85" text-anchor="middle" font-size="6.5" fill="#4B5563" class="mono">0.55</text>
+
+        <!-- dots -->
+        <text x="80" y="100" text-anchor="middle" font-size="8" fill="#9CA3AF">&#x22EE;</text>
+
+        <!-- border -->
+        <rect x="0" y="0" width="160" height="88" rx="2" fill="none" stroke="#D1D5DB" stroke-width="0.8"/>
+
+        <!-- Group brackets -->
+        <line x1="164" y1="16" x2="168" y2="16" stroke="#D6604D" stroke-width="0.6"/>
+        <line x1="168" y1="16" x2="168" y2="50" stroke="#D6604D" stroke-width="0.6"/>
+        <line x1="164" y1="50" x2="168" y2="50" stroke="#D6604D" stroke-width="0.6"/>
+        <text x="172" y="40" font-size="6" fill="#D6604D">group</text>
+
+        <line x1="164" y1="53" x2="168" y2="53" stroke="#D6604D" stroke-width="0.6"/>
+        <line x1="168" y1="53" x2="168" y2="87" stroke="#D6604D" stroke-width="0.6"/>
+        <line x1="164" y1="87" x2="168" y2="87" stroke="#D6604D" stroke-width="0.6"/>
+        <text x="172" y="77" font-size="6" fill="#D6604D">group</text>
+      </g>
+
+      <text x="8" y="144" font-size="7" fill="#6B7280" class="mono">df.groupby('TF').head(k)</text>
+    </g>
+
+    <!-- RIGHT: flashscenic adjacency matrix -->
+    <g transform="translate(194,26)">
+      <rect x="12" y="0" width="80" height="16" rx="8" fill="#3B82F6" opacity="0.12"/>
+      <text x="52" y="11" text-anchor="middle" font-size="8.5" font-weight="600" fill="#3B82F6">flashscenic</text>
+
+      <text x="6" y="27" font-size="8.5" font-weight="500" fill="#374151">Adjacency matrix (tensor)</text>
+
+      <!-- Matrix grid -->
+      <g transform="translate(6,37)">
+        <!-- Row labels (TFs) -->
+        <text x="-3" y="11" text-anchor="end" font-size="6" fill="#1E3A8A">TF&#x2081;</text>
+        <text x="-3" y="29" text-anchor="end" font-size="6" fill="#1E3A8A">TF&#x2082;</text>
+        <text x="-3" y="47" text-anchor="end" font-size="6" fill="#1E3A8A">TF&#x2083;</text>
+        <text x="-3" y="65" text-anchor="end" font-size="6" fill="#1E3A8A">TF&#x2084;</text>
+        <text x="-3" y="80" text-anchor="end" font-size="6" fill="#9CA3AF">&#x22EE;</text>
+
+        <!-- Column labels (Genes) -->
+        <text x="9" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">G&#x2081;</text>
+        <text x="27" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">G&#x2082;</text>
+        <text x="45" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">G&#x2083;</text>
+        <text x="63" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">G&#x2084;</text>
+        <text x="81" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">G&#x2085;</text>
+        <text x="99" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">G&#x2086;</text>
+        <text x="117" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">G&#x2087;</text>
+        <text x="135" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">G&#x2088;</text>
+
+        <!-- Row 1 (top-k=3 highlighted) -->
+        <rect x="0" y="2" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.7" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="8" y="12" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.82</text>
+        <rect x="18" y="2" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="26" y="12" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.12</text>
+        <rect x="36" y="2" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.5" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="44" y="12" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.71</text>
+        <rect x="54" y="2" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="62" y="12" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.08</text>
+        <rect x="72" y="2" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="80" y="12" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.15</text>
+        <rect x="90" y="2" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.4" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="98" y="12" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.65</text>
+        <rect x="108" y="2" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="116" y="12" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.04</text>
+        <rect x="126" y="2" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="134" y="12" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.21</text>
+
+        <!-- Row 2 -->
+        <rect x="0" y="20" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="8" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.05</text>
+        <rect x="18" y="20" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.7" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="26" y="30" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.91</text>
+        <rect x="36" y="20" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="44" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.10</text>
+        <rect x="54" y="20" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.5" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="62" y="30" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.78</text>
+        <rect x="72" y="20" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="80" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.03</text>
+        <rect x="90" y="20" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="98" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.11</text>
+        <rect x="108" y="20" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.35" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="116" y="30" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.55</text>
+        <rect x="126" y="20" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="134" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.07</text>
+
+        <!-- Row 3 -->
+        <rect x="0" y="38" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="8" y="48" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.20</text>
+        <rect x="18" y="38" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="26" y="48" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.09</text>
+        <rect x="36" y="38" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.7" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="44" y="48" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.88</text>
+        <rect x="54" y="38" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.5" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="62" y="48" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.73</text>
+        <rect x="72" y="38" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="80" y="48" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.06</text>
+        <rect x="90" y="38" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="98" y="48" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.14</text>
+        <rect x="108" y="38" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="116" y="48" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.02</text>
+        <rect x="126" y="38" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.4" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="134" y="48" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.60</text>
+
+        <!-- Row 4 -->
+        <rect x="0" y="56" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.5" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="8" y="66" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.76</text>
+        <rect x="18" y="56" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="26" y="66" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.18</text>
+        <rect x="36" y="56" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="44" y="66" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.11</text>
+        <rect x="54" y="56" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="62" y="66" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.22</text>
+        <rect x="72" y="56" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.7" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="80" y="66" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.85</text>
+        <rect x="90" y="56" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="98" y="66" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.09</text>
+        <rect x="108" y="56" width="16" height="14" rx="2" fill="#E5E7EB" opacity="0.4"/>
+        <text x="116" y="66" text-anchor="middle" font-size="5.5" fill="#9CA3AF">.13</text>
+        <rect x="126" y="56" width="16" height="14" rx="2" fill="#3B82F6" opacity="0.4" stroke="#2563EB" stroke-width="0.7"/>
+        <text x="134" y="66" text-anchor="middle" font-size="5.5" fill="white" font-weight="600">.62</text>
+
+        <!-- topk annotation -->
+        <text x="146" y="12" font-size="5.5" fill="#2563EB" font-weight="500">top 3</text>
+        <text x="146" y="30" font-size="5.5" fill="#2563EB" font-weight="500">top 3</text>
+        <text x="146" y="48" font-size="5.5" fill="#2563EB" font-weight="500">top 3</text>
+        <text x="146" y="66" font-size="5.5" fill="#2563EB" font-weight="500">top 3</text>
+      </g>
+
+      <text x="8" y="115" font-size="7" fill="#6B7280" class="mono">torch.topk(adj, k, dim=1)</text>
+      <text x="8" y="126" font-size="7" fill="#6B7280">All TFs processed in one operation</text>
+    </g>
+
+    <!-- Bottom: operations comparison table -->
+    <g transform="translate(6, 182)">
+      <line x1="0" y1="0" x2="370" y2="0" stroke="#E5E7EB" stroke-width="0.6"/>
+      <text x="4" y="14" font-size="8.5" font-weight="600" fill="#374151">Operations comparison</text>
+
+      <!-- Table -->
+      <g transform="translate(4, 20)">
+        <!-- Header -->
+        <rect x="0" y="0" width="358" height="14" rx="2" fill="#F3F4F6"/>
+        <text x="86" y="10" text-anchor="middle" font-size="6.5" font-weight="600" fill="#4B5563">Operation</text>
+        <text x="205" y="10" text-anchor="middle" font-size="6.5" font-weight="600" fill="#D6604D">pySCENIC</text>
+        <text x="312" y="10" text-anchor="middle" font-size="6.5" font-weight="600" fill="#3B82F6">flashscenic</text>
+        <line x1="144" y1="0" x2="144" y2="14" stroke="#E5E7EB" stroke-width="0.4"/>
+        <line x1="264" y1="0" x2="264" y2="14" stroke="#E5E7EB" stroke-width="0.4"/>
+
+        <!-- Row 1 -->
+        <rect x="0" y="15" width="358" height="15" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="6" y="26" font-size="6.5" fill="#4B5563">Top-k targets per TF</text>
+        <text x="148" y="26" font-size="6.5" fill="#6B7280" class="mono">groupby.head(k)</text>
+        <text x="268" y="26" font-size="6.5" fill="#6B7280" class="mono">topk(dim=1)</text>
+        <line x1="144" y1="15" x2="144" y2="30" stroke="#E5E7EB" stroke-width="0.3"/>
+        <line x1="264" y1="15" x2="264" y2="30" stroke="#E5E7EB" stroke-width="0.3"/>
+
+        <!-- Row 2 -->
+        <rect x="0" y="31" width="358" height="15" fill="#FAFBFC" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="6" y="42" font-size="6.5" fill="#4B5563">Threshold / percentile</text>
+        <text x="148" y="42" font-size="6.5" fill="#6B7280" class="mono">filter per group</text>
+        <text x="268" y="42" font-size="6.5" fill="#6B7280" class="mono">where(adj &gt;= t)</text>
+        <line x1="144" y1="31" x2="144" y2="46" stroke="#E5E7EB" stroke-width="0.3"/>
+        <line x1="264" y1="31" x2="264" y2="46" stroke="#E5E7EB" stroke-width="0.3"/>
+
+        <!-- Row 3 -->
+        <rect x="0" y="47" width="358" height="15" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="6" y="58" font-size="6.5" fill="#4B5563">Top-N per target gene</text>
+        <text x="148" y="58" font-size="6.5" fill="#6B7280" class="mono">groupby per gene</text>
+        <text x="268" y="58" font-size="6.5" fill="#6B7280" class="mono">topk on transpose</text>
+        <line x1="144" y1="47" x2="144" y2="62" stroke="#E5E7EB" stroke-width="0.3"/>
+        <line x1="264" y1="47" x2="264" y2="62" stroke="#E5E7EB" stroke-width="0.3"/>
+
+        <!-- Row 4 -->
+        <rect x="0" y="63" width="358" height="15" fill="#FAFBFC" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="6" y="74" font-size="6.5" fill="#4B5563">Min-target filtering</text>
+        <text x="148" y="74" font-size="6.5" fill="#6B7280" class="mono">len check per TF</text>
+        <text x="268" y="74" font-size="6.5" fill="#6B7280" class="mono">count_nonzero(row)</text>
+        <line x1="144" y1="63" x2="144" y2="78" stroke="#E5E7EB" stroke-width="0.3"/>
+        <line x1="264" y1="63" x2="264" y2="78" stroke="#E5E7EB" stroke-width="0.3"/>
+
+        <!-- Row 5 -->
+        <rect x="0" y="79" width="358" height="15" fill="none" stroke="#E5E7EB" stroke-width="0.3"/>
+        <text x="6" y="90" font-size="6.5" fill="#4B5563">DB mapping filter</text>
+        <text x="148" y="90" font-size="6.5" fill="#6B7280" class="mono">inline check</text>
+        <text x="268" y="90" font-size="6.5" fill="#6B7280" class="mono">vectorized mask</text>
+        <line x1="144" y1="79" x2="144" y2="94" stroke="#E5E7EB" stroke-width="0.3"/>
+        <line x1="264" y1="79" x2="264" y2="94" stroke="#E5E7EB" stroke-width="0.3"/>
+
+        <!-- Border -->
+        <rect x="0" y="0" width="358" height="94" rx="2" fill="none" stroke="#D1D5DB" stroke-width="0.6"/>
+      </g>
+    </g>
+  </svg>
+
+  <!-- ============================================================ -->
+  <!-- PANEL C: cisTarget Motif Enrichment                          -->
+  <!-- ============================================================ -->
+  <svg x="319" y="250" width="302" height="250" viewBox="0 0 375 310">
+    <text x="4" y="14" font-size="16" font-weight="700" fill="#111827">c</text>
+    <text x="24" y="14" font-size="12" font-weight="600" fill="#374151">cisTarget motif enrichment</text>
+
+    <line x1="187" y1="24" x2="187" y2="196" stroke="#E5E7EB" stroke-width="0.8" stroke-dasharray="4,3"/>
+
+    <!-- LEFT: pySCENIC -->
+    <g transform="translate(8,26)">
+      <rect x="20" y="0" width="72" height="16" rx="8" fill="#D6604D" opacity="0.12"/>
+      <text x="56" y="11" text-anchor="middle" font-size="8.5" font-weight="600" fill="#D6604D">pySCENIC</text>
+
+      <g transform="translate(8,22)">
+        <line x1="20" y1="8" x2="20" y2="120" stroke="#D1D5DB" stroke-width="0.7"/>
+        <line x1="20" y1="120" x2="150" y2="120" stroke="#D1D5DB" stroke-width="0.7"/>
+        <text x="8" y="68" text-anchor="middle" font-size="5.5" fill="#9CA3AF" transform="rotate(-90,8,68)">recovery</text>
+        <text x="85" y="131" text-anchor="middle" font-size="5.5" fill="#9CA3AF">gene rank</text>
+
+        <!-- Waiting curves (gray) -->
+        <polyline fill="none" stroke="#D1D5DB" stroke-width="0.8" opacity="0.5"
+          points="20,116 33,112 46,102 59,92 72,86 85,83 98,81 111,80 124,79 137,78"/>
+        <polyline fill="none" stroke="#D1D5DB" stroke-width="0.8" opacity="0.5"
+          points="20,118 33,116 46,110 59,104 72,98 85,95 98,93 111,91 124,90 137,89"/>
+        <polyline fill="none" stroke="#D1D5DB" stroke-width="0.8" opacity="0.5"
+          points="20,118 33,117 46,114 59,110 72,107 85,104 98,102 111,100 124,99 137,98"/>
+        <polyline fill="none" stroke="#D1D5DB" stroke-width="0.8" opacity="0.5"
+          points="20,117 33,114 46,106 59,98 72,90 85,86 98,83 111,81 124,80 137,79"/>
+
+        <!-- Active curve (coral) -->
+        <polyline fill="none" stroke="#D6604D" stroke-width="2"
+          points="20,116 33,110 46,96 59,78 72,62 85,52 98,46 111,43 124,41 137,39"/>
+        <circle cx="85" cy="52" r="2.5" fill="#D6604D"/>
+        <text x="72" y="44" font-size="6" fill="#D6604D" font-weight="500">computing...</text>
+      </g>
+
+      <text x="22" y="166" font-size="7.5" fill="#991B1B" font-weight="500">One motif at a time</text>
+      <text x="22" y="176" font-size="7" fill="#6B7280">Loop per motif row (bincount &#x2192; cumsum)</text>
+    </g>
+
+    <!-- RIGHT: flashscenic -->
+    <g transform="translate(194,26)">
+      <rect x="12" y="0" width="80" height="16" rx="8" fill="#3B82F6" opacity="0.12"/>
+      <text x="52" y="11" text-anchor="middle" font-size="8.5" font-weight="600" fill="#3B82F6">flashscenic</text>
+
+      <g transform="translate(8,22)">
+        <line x1="20" y1="8" x2="20" y2="120" stroke="#D1D5DB" stroke-width="0.7"/>
+        <line x1="20" y1="120" x2="150" y2="120" stroke="#D1D5DB" stroke-width="0.7"/>
+        <text x="8" y="68" text-anchor="middle" font-size="5.5" fill="#9CA3AF" transform="rotate(-90,8,68)">recovery</text>
+        <text x="85" y="131" text-anchor="middle" font-size="5.5" fill="#9CA3AF">gene rank</text>
+
+        <!-- ALL curves at once (blue) -->
+        <polyline fill="none" stroke="#3B82F6" stroke-width="1.3" opacity="0.6"
+          points="20,116 33,112 46,102 59,92 72,86 85,83 98,81 111,80 124,79 137,78"/>
+        <polyline fill="none" stroke="#3B82F6" stroke-width="1.3" opacity="0.6"
+          points="20,118 33,116 46,110 59,104 72,98 85,95 98,93 111,91 124,90 137,89"/>
+        <polyline fill="none" stroke="#3B82F6" stroke-width="1.3" opacity="0.6"
+          points="20,118 33,117 46,114 59,110 72,107 85,104 98,102 111,100 124,99 137,98"/>
+        <polyline fill="none" stroke="#3B82F6" stroke-width="1.3" opacity="0.6"
+          points="20,117 33,114 46,106 59,98 72,90 85,86 98,83 111,81 124,80 137,79"/>
+        <polyline fill="none" stroke="#3B82F6" stroke-width="1.6" opacity="0.85"
+          points="20,116 33,110 46,96 59,78 72,62 85,52 98,46 111,43 124,41 137,39"/>
+      </g>
+
+      <text x="22" y="166" font-size="7.5" fill="#1E3A8A" font-weight="500">All motifs simultaneously</text>
+      <text x="22" y="176" font-size="7" fill="#6B7280">Vectorized on GPU in one pass</text>
+    </g>
+
+    <!-- Bottom: How it works (mechanism) -->
+    <g transform="translate(6, 206)">
+      <line x1="0" y1="0" x2="370" y2="0" stroke="#E5E7EB" stroke-width="0.6"/>
+      <text x="4" y="14" font-size="8.5" font-weight="600" fill="#374151">How: vectorized recovery in flashscenic</text>
+
+      <!-- Flow diagram -->
+      <g transform="translate(4, 22)">
+        <!-- Step 1: Ranking DB -->
+        <rect x="0" y="0" width="66" height="32" rx="3" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="0.8"/>
+        <text x="33" y="12" text-anchor="middle" font-size="6.5" font-weight="600" fill="#1E3A8A">Ranking DB</text>
+        <text x="33" y="22" text-anchor="middle" font-size="6" fill="#6B7280">(motifs &#xD7; genes)</text>
+        <text x="33" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">int32 tensor</text>
+
+        <line x1="70" y1="16" x2="84" y2="16" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arr-b2)"/>
+        <text x="77" y="10" text-anchor="middle" font-size="5" fill="#6B7280">index</text>
+
+        <!-- Step 2: Module rankings -->
+        <rect x="88" y="0" width="66" height="32" rx="3" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="0.8"/>
+        <text x="121" y="12" text-anchor="middle" font-size="6.5" font-weight="600" fill="#1E3A8A">Module ranks</text>
+        <text x="121" y="22" text-anchor="middle" font-size="6" fill="#6B7280">(motifs &#xD7; k)</text>
+        <text x="121" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">gather cols</text>
+
+        <line x1="158" y1="16" x2="172" y2="16" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arr-b2)"/>
+        <text x="165" y="10" text-anchor="middle" font-size="5" fill="#6B7280">accum</text>
+
+        <!-- Step 3: Recovery curves -->
+        <rect x="176" y="0" width="66" height="32" rx="3" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="0.8"/>
+        <text x="209" y="12" text-anchor="middle" font-size="6.5" font-weight="600" fill="#1E3A8A">Recovery</text>
+        <text x="209" y="22" text-anchor="middle" font-size="6" fill="#6B7280">(motifs &#xD7; ranks)</text>
+        <text x="209" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">cumsum</text>
+
+        <line x1="246" y1="16" x2="260" y2="16" stroke="#3B82F6" stroke-width="0.8" marker-end="url(#arr-b2)"/>
+
+        <!-- Step 4: AUC → NES -->
+        <rect x="264" y="0" width="92" height="32" rx="3" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="0.8"/>
+        <text x="310" y="12" text-anchor="middle" font-size="6.5" font-weight="600" fill="#1E3A8A">AUC &#x2192; NES</text>
+        <text x="310" y="22" text-anchor="middle" font-size="6" fill="#6B7280">sum / max_auc</text>
+        <text x="310" y="30" text-anchor="middle" font-size="5.5" fill="#9CA3AF">(auc&#x2212;&#x03BC;)/&#x03C3;</text>
+      </g>
+
+      <!-- Key insight -->
+      <g transform="translate(4, 60)">
+        <rect x="0" y="0" width="358" height="24" rx="3" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="0.6"/>
+        <text x="10" y="10" font-size="7" fill="#5B21B6" font-weight="500">Multi-database support: prune across multiple ranking DBs, merge by union or best NES</text>
+        <text x="10" y="20" font-size="7" fill="#5B21B6" font-weight="500">Leading edge: vectorized argmax(RCC &#x2212; (&#x03BC;+2&#x03C3;)) for all enriched motifs at once</text>
+      </g>
+    </g>
+  </svg>
+
+  <!-- ============================================================ -->
+  <!-- PANEL D: AUCell                                              -->
+  <!-- ============================================================ -->
+  <svg x="638" y="250" width="302" height="250" viewBox="0 0 375 310">
+    <text x="4" y="14" font-size="16" font-weight="700" fill="#111827">d</text>
+    <text x="24" y="14" font-size="12" font-weight="600" fill="#374151">AUCell computation</text>
+
+    <line x1="187" y1="24" x2="187" y2="210" stroke="#E5E7EB" stroke-width="0.8" stroke-dasharray="4,3"/>
+
+    <!-- LEFT: pySCENIC -->
+    <g transform="translate(6,26)">
+      <rect x="24" y="0" width="72" height="16" rx="8" fill="#D6604D" opacity="0.12"/>
+      <text x="60" y="11" text-anchor="middle" font-size="8.5" font-weight="600" fill="#D6604D">pySCENIC</text>
+
+      <text x="8" y="28" font-size="7.5" fill="#6B7280">Cells &#xD7; Regulons</text>
+
+      <!-- Grid -->
+      <g transform="translate(8,39)">
+        <!-- Column labels -->
+        <text x="9" y="-3" text-anchor="middle" font-size="5.5" fill="#9CA3AF">R&#x2081;</text>
+        <text x="23" y="-3" text-anchor="middle" font-size="5.5" fill="#9CA3AF">R&#x2082;</text>
+        <text x="37" y="-3" text-anchor="middle" font-size="5.5" fill="#9CA3AF">R&#x2083;</text>
+        <text x="51" y="-3" text-anchor="middle" font-size="5.5" fill="#9CA3AF">R&#x2084;</text>
+        <text x="65" y="-3" text-anchor="middle" font-size="5.5" fill="#9CA3AF">R&#x2085;</text>
+        <text x="79" y="-3" text-anchor="middle" font-size="5.5" fill="#9CA3AF">R&#x2086;</text>
+        <text x="93" y="-3" text-anchor="middle" font-size="5.5" fill="#9CA3AF">R&#x2087;</text>
+        <text x="107" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">...</text>
+
+        <!-- Row 0 -->
+        <rect x="0" y="0" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="0" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="0" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="0" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="0" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="0" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="0" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="0" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <!-- Row 1 -->
+        <rect x="0" y="13" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="13" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="13" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="13" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="13" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="13" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="13" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="13" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <!-- Row 2 — highlighted cell at col 4 (R5) -->
+        <rect x="0" y="26" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="26" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="26" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="26" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="26" width="12" height="11" rx="1.5" fill="#D6604D" stroke="#B91C1C" stroke-width="0.8"/>
+        <rect x="70" y="26" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="26" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="26" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <!-- Row 3 -->
+        <rect x="0" y="39" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="39" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="39" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="39" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="39" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="39" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="39" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="39" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <!-- Row 4 -->
+        <rect x="0" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <!-- Row 5 -->
+        <rect x="0" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <!-- Row 6 -->
+        <rect x="0" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <!-- Row 7 -->
+        <rect x="0" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+
+        <!-- Label for highlighted cell -->
+        <text x="50" y="25" font-size="6" fill="#D6604D" font-weight="600" text-anchor="middle">&#x2193; active</text>
+      </g>
+
+      <g transform="translate(30,145)">
+        <path d="M0,0 C0,-5 8,-5 8,0 L8,5 C8,10 0,10 0,5 Z" stroke="#D6604D" stroke-width="0.8" fill="none"/>
+        <polygon points="1.5,5 -0.5,2.5 3.5,2.5" fill="#D6604D"/>
+        <text x="13" y="3" font-size="7.5" fill="#991B1B" font-weight="500">Sequential per (cell, regulon)</text>
+        <text x="13" y="13" font-size="7" fill="#6B7280">Numba JIT + multiprocess fork</text>
+      </g>
+    </g>
+
+    <!-- RIGHT: flashscenic -->
+    <g transform="translate(194,26)">
+      <rect x="12" y="0" width="80" height="16" rx="8" fill="#3B82F6" opacity="0.12"/>
+      <text x="52" y="11" text-anchor="middle" font-size="8.5" font-weight="600" fill="#3B82F6">flashscenic</text>
+
+      <text x="8" y="28" font-size="7.5" fill="#6B7280">Cells &#xD7; TFs</text>
+
+      <g transform="translate(8,39)">
+        <text x="9" y="-3" text-anchor="middle" font-size="5.5" fill="#3B82F6">TF&#x2081;</text>
+        <text x="23" y="-3" text-anchor="middle" font-size="5.5" fill="#3B82F6">TF&#x2082;</text>
+        <text x="37" y="-3" text-anchor="middle" font-size="5.5" fill="#3B82F6">TF&#x2083;</text>
+        <text x="51" y="-3" text-anchor="middle" font-size="5.5" fill="#3B82F6">TF&#x2084;</text>
+        <text x="65" y="-3" text-anchor="middle" font-size="5.5" fill="#3B82F6">TF&#x2085;</text>
+        <text x="79" y="-3" text-anchor="middle" font-size="5.5" fill="#3B82F6">TF&#x2086;</text>
+        <text x="93" y="-3" text-anchor="middle" font-size="5.5" fill="#3B82F6">TF&#x2087;</text>
+        <text x="107" y="-3" text-anchor="middle" font-size="5.5" fill="#6B7280">...</text>
+
+        <!-- Batch highlight -->
+        <rect x="-2" y="-1" width="116" height="50" rx="3" fill="#3B82F6" opacity="0.06" stroke="#3B82F6" stroke-width="1" stroke-dasharray="3,2"/>
+
+        <!-- Rows 0-3: batch (blue) -->
+        <rect x="0" y="0" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="14" y="0" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="28" y="0" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="42" y="0" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="56" y="0" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="70" y="0" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="84" y="0" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="98" y="0" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+
+        <rect x="0" y="13" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="14" y="13" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="28" y="13" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="42" y="13" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="56" y="13" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="70" y="13" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="84" y="13" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="98" y="13" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+
+        <rect x="0" y="26" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="14" y="26" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="28" y="26" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="42" y="26" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="56" y="26" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="70" y="26" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="84" y="26" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="98" y="26" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+
+        <rect x="0" y="39" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="14" y="39" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="28" y="39" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="42" y="39" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="56" y="39" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="70" y="39" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="84" y="39" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+        <rect x="98" y="39" width="12" height="11" rx="1.5" fill="#3B82F6" stroke="#2563EB" stroke-width="0.5"/>
+
+        <text x="118" y="29" font-size="6" fill="#2563EB" font-weight="600">batch</text>
+
+        <!-- Waiting rows (gray) -->
+        <rect x="0" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="52" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+
+        <rect x="0" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="65" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+
+        <rect x="0" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="78" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+
+        <rect x="0" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="14" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="28" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="42" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="56" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="70" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="84" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+        <rect x="98" y="91" width="12" height="11" rx="1.5" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="0.4"/>
+      </g>
+
+      <g transform="translate(24,145)">
+        <text x="0" y="3" font-size="7.5" fill="#1E3A8A" font-weight="500">Batch &#xD7; all TFs at once</text>
+        <text x="0" y="13" font-size="7" fill="#6B7280">PyTorch tensor operations</text>
+      </g>
+    </g>
+
+    <!-- Bottom notes (Ranking first, then Tie-breaking) -->
+    <g transform="translate(6, 195)">
+      <line x1="0" y1="0" x2="370" y2="0" stroke="#E5E7EB" stroke-width="0.6"/>
+
+      <!-- Ranking -->
+      <text x="4" y="14" font-size="8" font-weight="600" fill="#374151">Ranking</text>
+      <g transform="translate(4, 20)">
+        <rect x="0" y="0" width="7" height="7" rx="1" fill="#D6604D" opacity="0.25"/>
+        <text x="11" y="7" font-size="7" fill="#6B7280">Pre-compute full ranking matrix (uint32 DataFrame)</text>
+        <rect x="0" y="11" width="7" height="7" rx="1" fill="#3B82F6" opacity="0.25"/>
+        <text x="11" y="18" font-size="7" fill="#6B7280">Rank on-the-fly via argsort (no storage overhead)</text>
+      </g>
+
+      <!-- Tie-breaking -->
+      <text x="4" y="50" font-size="8" font-weight="600" fill="#374151">Tie-breaking</text>
+      <g transform="translate(4, 56)">
+        <rect x="0" y="0" width="7" height="7" rx="1" fill="#D6604D" opacity="0.25"/>
+        <text x="11" y="7" font-size="7" fill="#6B7280">Shuffle column order, then rank (order-dependent)</text>
+        <rect x="0" y="11" width="7" height="7" rx="1" fill="#3B82F6" opacity="0.25"/>
+        <text x="11" y="18" font-size="7" fill="#6B7280">Add tiny noise (10&#x207B;&#xB9;&#x2070;), preserves gene identity</text>
+      </g>
+    </g>
+  </svg>
+
+</svg>
