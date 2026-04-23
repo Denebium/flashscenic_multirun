@@ -514,7 +514,7 @@ def run_flashscenic(
         "regulon_adj": regulon_adj,
         "regulon_occurrence": regulon_occ_adj,
         "regulon_names_occurrence": regulon_names_occurrence,
-        "genes_names": gene_names,
+        "gene_names": gene_names,
         "cell_names": cell_names,
         "parameters": {
             "species": species,
